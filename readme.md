@@ -1,5 +1,5 @@
 # GitHub Deployment Blocking Tool
-This tool is a serverless function written in Rust, designed to be deployed to AWS Lambda, that automatically blocks and unblocks merge requests to a GitHub repository during deployment.
+This tool is a serverless function written in Rust, which automatically blocks and unblocks merge requests to a GitHub repository during deployment based on specific Slack commands. The function is designed to be triggered by Slack events.
 
 ## Setup
 To set up the function, you will need to:
@@ -10,15 +10,22 @@ To set up the function, you will need to:
 4. Deploy the function to AWS Lambda.
 
 ## Configuration
-To configure the function, you will need to provide your GitHub token, which the function uses to authenticate with the GitHub API. You will need to replace "GITHUB_TOKEN" with your actual GitHub token in the main function.
+This function uses two main configuration parameters: the GitHub API URL and the token for accessing the GitHub API. These parameters are stored in a Config struct, which is passed around in the function.
 
-### You will also need to replace "https://api.github.com/repos/OWNER/REPO/branches/BRANCH/protection/required_status_checks" with the URL of the status checks for the branch you want to protect.
+`pub struct Config {
+    pub url: String,
+    pub token: String,
+}
+`
+#### You will also need to replace "https://api.github.com/repos/OWNER/REPO/branches/BRANCH/protection/required_status_checks" and "GITHUB_TOKEN" in the Config::new function call with your actual values.
+
+#### Additionally, you need to set up a webhook in your Slack workspace to enable the function to receive Slack events and execute the block and unblock operations.
 
 ## Usage
-The function automatically runs whenever a deployment starts or ends. When a deployment starts, it blocks all merge requests to the specified branch. When the deployment ends, it unblocks all merge requests.
+The function listens for specific Slack commands. When a deployment starts, the appropriate Slack command triggers the function to block all merge requests to the specified branch. When the deployment ends, a different Slack command triggers the function to unblock all merge requests.
 
 ## Testing
-You can run tests for this function using cargo test.
+You can run tests for this function using cargo test. The tests ensure that the function correctly sets up the headers for the GitHub API request.
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
